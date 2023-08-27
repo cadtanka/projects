@@ -1,0 +1,133 @@
+## CSE 331 hw-poly Questions
+## Part 0
+###########################################################################
+
+1. Multiplication Pseudocode
+r = p * q
+    {inv: r = q * (p...i-1)
+    foreach term, tp, in p:
+        set w = q by making a term-by-term copy of all terms in q to w
+        multiply w by tp
+        add w to r
+
+2. Division Pseudocode
+final = p / q
+    final;
+    set w = p by making a term-by-term copy of all terms in p to w
+    quotient;
+    temp;
+    {inv: p = quotient * q + w}
+    while(w[0] is divisible by q[0])
+        set quotient equal to how many times q[0] goes into w[0]
+        add quotient to final
+        set temp equal to (quotient * q)
+        subtract temp from w
+
+3. Division Example: (x^3+x-1) / (x+1) = x^2-x+2
+    p = x^3+x-1
+    q = x+1
+    final = x^2 - x+2
+    w = copy of p = x^3+x-1
+    temp = null;
+    quotient = null;
+    while(w[0] is divisible by q[0]) YES: x/x^3
+        Iteration 1: p = x^3+x-1, q = x+1, final = x^2, w = -x^2 + x - 1, temp = x^3 + x^2, quotient = x^2
+            set quotient equal to how many times q[0] goes into w[0]: quotient = x^2
+            add quotient to final: final = x^2
+            set temp equal to (quotient * q): temp = x^3 + x^2
+            subtract temp from w: w = -x^2 + x - 1 [w = (x^3+x-1) - (x^3 + x^2)]
+
+        Iteration 2: p = x^3 + x-1, q = x+1, final = x^2-x, w = 2x-1, temp = -x^2-x, quotient = -x
+            set quotient equal to how many times q[0] goes into w[0]: quotient = -x
+            add quotient to final: final = x^2 -x
+            set temp equal to (quotient * q): -x^2 - x
+            subtract temp from w: w = 2x - 1
+
+        Iteration 3: p = x^3 + x-1, q = x+1, final = x^2-x+2, w = -3, temp = 2x + 2, quotient = 2
+            set quotient equal to how many times q[0] goes into w[0]: quotient = 2
+            add quotient to final: final = x^2-x+2
+            set temp equal to (quotient * q): temp = 2x + 2
+            subtract temp from w: w = -3
+    We are done! final = x^2-x+2
+
+## Part 1
+###########################################################################
+
+1. Weakened Rep Invariant
+RatNum(int n, int d) would not have to check further than whether d = 0
+    This would likely increase execution efficiency, as this is one less check needed to be done.
+    Also would improve code clarity
+In checkRep, the if statement will no longer be needed.
+    This would also increase execution efficiency, and would improve code clarity
+Would not need the gcd method! Since there is no need to simplify, the gcd serves no purpose
+    This would increase execution efficiency and improve code clarity
+
+2. Alternate add, sub, mul, div
+The new this.numer and this.denom would not be in reduced form anymore, and not immutable. The check to uphold the rep
+invariant would no longer be carried out, as the constructor would not be ran. As a result, these new values are at
+risk of violating the specs of the class.
+
+
+
+3. Constructor checkReps
+checkReps cam be called only at the end of the method because the ratNum is never actually changed by any methods.
+This is done through breaking down the ratNum into denom and numer, and altering those instead.
+
+
+
+## Part 2
+###########################################################################
+
+1. Calls to checkRep in RatTerm
+I called checkRep at the end of constructors. As stated earlier, the ratNum in focus is not ever changed by any methods,
+so no method is in danger of violating the rep invariant
+
+
+2. Weakened Rep Invariant
+In the constructor, would not need to set the exponent to zero. This would improve code efficiency and clarity, as
+it's one less line of code to run
+In checkRep, would no longer need to assert the second line. This would also improve code efficiency and clarity for
+the same reasons
+In add, you could implement in a check to see whether the exponent is zero, and if it is zero, set the ratTerm to 1,
+then continue with adding. This would decrease code efficiency, but increase code clarity
+In subtract, you could have to implement a similar idea before subtracting
+In multiply, you could set an additional case, saying that if any number is zero to a nonzero power, simply return the
+other number. This may improve code clarity, as it shows what happens in certain zero cases. However this would decrease
+code efficiency
+In divide, you would have to write a case to deal with zero coeff, to avoid dividing by zero. This would decrease code
+efficiency, but may improve code clarity, as a viewer could see what would happen in zero cases.
+For toString, you would need to run an extra case, to make sure that there is a check for if c = 0 and e != 0, and make
+sure that this returns 1. This would decrease code clarity and efficiency
+
+3. Alternate Rep Invariant
+For this invariant, you would need to change isNaN. If the expt is not equal to zero, you would need to change it to
+be zero before returning the value. This would decrease code clarity and efficiency
+For eval, you would have to do an extra check, since if the exponent is not zero, it would not be flagged as NaN. You
+would also have to check that the double.NaN you're returning is of exponent 0
+This would decrease code clarity and efficiency
+The same change would be needed for negate
+For add, sub, mul. and div you would have to do similar, and make sure that the NaN being returned is of 0 expt. These
+would all decrease code clarity and efficiency
+
+
+4. Preferred Invariants
+
+
+
+
+## Part 3
+###########################################################################
+
+1. Calls to checkRep in RatPoly
+I included calls to checkRep at the end of all of my constructors and methods that deal with this poly. This is because
+when these RatPoly's are made, it is most likely that here the rep inv is violated. I also included it in the other
+specified methods to make sure the poly being looked at is not violating the rep inv (more of a fail-safe).
+
+
+2. Alternate Representation
+One advantage is that the entire class of RatTerm is no longer needed. The only implemented classes used in RatPoly
+would be the RatNum class. However, the main disadvantage is that the methods within RatPoly would become much longer
+and complicated, decreasing code clarity. I think that for clarity's sake, the representation of a RatPoly should be a
+list of RatTerms. This will keep the methods more concise and readable.
+
+
