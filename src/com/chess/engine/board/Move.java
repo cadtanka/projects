@@ -360,7 +360,7 @@ public abstract class Move {
             }
             builder.setPiece(this.movedPiece.movePiece(this));
             //TODO: First move checker
-            builder.setPiece(new Rook(this.castleRookDestination, this.castleRook.getAlliance()));
+            builder.setPiece(new Rook(this.castleRook.getAlliance(), this.castleRookDestination,false));
             builder.setMoveMaker((this.board.currentPlayer().getOpponent().getAlliance()));
 
             return builder.build();

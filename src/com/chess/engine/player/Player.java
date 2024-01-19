@@ -31,7 +31,7 @@ public abstract class Player {
     }
 
     //Calculates the players pieces attacks on a given tile
-    public static Collection<Move> calculateAttackOnTile(int piecePosition, Collection<Move> moves) {
+    public static Collection<Move>calculateAttackOnTile(int piecePosition, Collection<Move> moves) {
         final List<Move> attackMoves = new ArrayList<>();
         for(final Move move : moves) {
             if(piecePosition == move.getDestinationCoordinate()) {

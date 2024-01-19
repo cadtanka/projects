@@ -1,5 +1,7 @@
 package com.chess.engine.board;
 
+import com.chess.engine.pieces.King;
+import com.chess.engine.pieces.Piece;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.HashMap;
@@ -84,6 +86,16 @@ public class BoardUtils {
         int topLeft = piecePos;
         int topRight = piecePos;
 
+        if(FIRST_COLUMN[piecePos]) {
+            topLeftDone = true;
+            botLeftDone = true;
+        }
+
+        if(EIGHTH_COLUMN[piecePos]) {
+            topRightDone = true;
+            botRightDone = true;
+        }
+
         while(!(botRightDone && botLeftDone && topLeftDone && topRightDone)) {
             if(!botLeftDone) {
                 botLeft -= 9;
@@ -150,6 +162,14 @@ public class BoardUtils {
             }
         }
     }
+
+    public static boolean isKingPawnTrap(final Board board, final King king, final int frontTile) {
+        final Piece piece = board.getTile(frontTile).getPiece();
+        return piece != null && piece.getPieceType() == Piece.PieceType.PAWN &&
+                piece.getAlliance() != king.getAlliance();
+    }
+
+    //TODO: Make method to check that king does not move into pawn attack path
 
     //Gets all coordinates of the tiles that are in the same row as a given spot
     public static void getRow(int piecePosition, List<Integer> moveCoordinates, Board board) {

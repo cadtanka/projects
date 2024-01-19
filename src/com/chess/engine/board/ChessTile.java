@@ -18,6 +18,7 @@ public abstract class ChessTile {
 
         for(int i = 0; i < 64; i++) {
             emptyTileMap.put(i, new EmptyTile(i));
+            emptyTileMap.put(i, new EmptyTile(i));
         }
 
         //Could download Guava dependency to make immutable (someone could change this tileMap))
