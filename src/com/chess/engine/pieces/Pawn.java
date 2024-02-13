@@ -16,6 +16,8 @@ import static com.chess.engine.board.Move.*;
 public class Pawn extends Piece {
     private static final int[] MOVE_COORDINATES = {16,9,8,7};
 
+    private static final int[] ghost_Attack_Moves = {9,7};
+
     public Pawn(int piecePosition, Alliance pieceAlliance) {
         super(PieceType.PAWN, piecePosition, pieceAlliance, true);
     }
@@ -25,7 +27,7 @@ public class Pawn extends Piece {
     }
 
     @Override
-    public Collection<Move> calculateLegalMoves(final Board board) {
+    public Collection<Move> calculateLegals(final Board board) {
         List<Move> legalMoves = new ArrayList<>();
 
         for(final int currSpot: MOVE_COORDINATES) {
@@ -91,6 +93,16 @@ public class Pawn extends Piece {
             }
         }
         return ImmutableList.copyOf(legalMoves);
+    }
+
+    //TODO: To fix bug that GUI displays a king can move into a pawn's attack square
+    public Collection<Integer> ghostAttack(final Board board) {
+        List<Integer> ghostReturn = new ArrayList<>();
+        for(final int currSpot : ghost_Attack_Moves) {
+            int move_Coordinate = this.piecePosition + (this.pieceAlliance.getDirection() * currSpot);
+            ghostReturn.add(move_Coordinate);
+        }
+        return ImmutableList.copyOf(ghostReturn);
     }
 
     @Override

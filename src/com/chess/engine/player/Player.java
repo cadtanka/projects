@@ -6,10 +6,10 @@ import com.chess.engine.board.Move;
 import com.chess.engine.pieces.King;
 import com.chess.engine.pieces.Piece;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public abstract class Player {
@@ -20,18 +20,18 @@ public abstract class Player {
     private final boolean inCheck;
 
     Player(final Board board,
-           final Collection<Move> legalMoves,
+           final Collection<Move> playerLegals,
            final Collection<Move> opponentMoves) {
 
         this.board = board;
         this.playerKing = establishKing();
-        this.legalMoves = ImmutableList.copyOf(Iterables.concat(legalMoves, calculateKingCastles(legalMoves, opponentMoves)));
+        playerLegals.addAll(calculateKingCastles(opponentMoves));
+        this.legalMoves = Collections.unmodifiableCollection(playerLegals);
         this.inCheck = !Player.calculateAttackOnTile(this.playerKing.getPiecePosition(), opponentMoves).isEmpty();
-
     }
 
     //Calculates the players pieces attacks on a given tile
-    public static Collection<Move>calculateAttackOnTile(int piecePosition, Collection<Move> moves) {
+    public static Collection<Move> calculateAttackOnTile(int piecePosition, Collection<Move> moves) {
         final List<Move> attackMoves = new ArrayList<>();
         for(final Move move : moves) {
             if(piecePosition == move.getDestinationCoordinate()) {
@@ -67,7 +67,7 @@ public abstract class Player {
     }
 
     public boolean inCheckMate() {
-        return this.inCheck && hasEscape();
+        return this.inCheck && !hasEscape();
     }
 
     //Makes the move on a hypothetical board, and checks whether it's in check
@@ -83,7 +83,7 @@ public abstract class Player {
     }
 
     public boolean inStaleMate() {
-        return !this.inCheck && hasEscape();
+        return !this.inCheck && !hasEscape();
     }
 
     public boolean isCastled() {
@@ -97,8 +97,8 @@ public abstract class Player {
 
         final Board transitionBoard = move.execute();
 
-        final Collection<Move> kingAttacks = Player.calculateAttackOnTile(transitionBoard.currentPlayer().getOpponent()
-                .getPlayerKing().getPiecePosition(), transitionBoard.currentPlayer().getLegalMoves());
+        final Collection<Move> kingAttacks = Player.calculateAttackOnTile(transitionBoard.getCurrentPlayer().getOpponent()
+                .getPlayerKing().getPiecePosition(), transitionBoard.getCurrentPlayer().getLegalMoves());
 
         if(!kingAttacks.isEmpty()) {
             return new MoveTransition(this.board, move, MoveStatus.PLAYER_IN_CHECK);
@@ -110,5 +110,5 @@ public abstract class Player {
     public abstract Collection<Piece> getActivePieces();
     public abstract Alliance getAlliance();
     public abstract Player getOpponent();
-    protected abstract Collection<Move> calculateKingCastles(Collection<Move> playerLegals, Collection<Move> opponentLegals);
+    public abstract Collection<Move> calculateKingCastles(Collection<Move> opponentLegals);
 }

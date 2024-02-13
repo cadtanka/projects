@@ -60,9 +60,9 @@ public class GameHistoryPanel extends JPanel {
     }
 
     private String calculateCheckAndCheckMateHash(Board board) {
-        if(board.currentPlayer().inCheckMate()) {
+        if(board.getCurrentPlayer().inCheckMate()) {
             return "#";
-        } else if (board.currentPlayer().inCheck()) {
+        } else if (board.getCurrentPlayer().inCheck()) {
             return "+";
         }
         return "";

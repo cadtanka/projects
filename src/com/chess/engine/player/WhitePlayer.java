@@ -6,6 +6,7 @@ import com.chess.engine.board.BoardUtils;
 import com.chess.engine.board.ChessTile;
 import com.chess.engine.board.Move;
 import com.chess.engine.pieces.Piece;
+import com.chess.engine.pieces.Piece.PieceType;
 import com.chess.engine.pieces.Rook;
 import com.google.common.collect.ImmutableList;
 import com.chess.engine.board.Move.KingSideCastleMove;
@@ -39,7 +40,12 @@ public class WhitePlayer extends Player {
     }
 
     @Override
-    protected Collection<Move> calculateKingCastles(Collection<Move> playerLegals, Collection<Move> opponentLegals) {
+    public String toString() {
+        return "White";
+    }
+
+    @Override
+    public Collection<Move> calculateKingCastles(Collection<Move> opponentLegals) {
         final List<Move> kingCastles = new ArrayList<>();
 
         if(this.playerKing.isFirstMove() && !this.inCheck()) {
@@ -50,11 +56,11 @@ public class WhitePlayer extends Player {
                 if(rookPiece != null && rookPiece.isFirstMove()) {
                     if(Player.calculateAttackOnTile(61, opponentLegals).isEmpty() &&
                         Player.calculateAttackOnTile(62, opponentLegals).isEmpty() &&
-                        rookPiece.getPieceType() == Piece.PieceType.ROOK) {
+                        rookPiece.getPieceType() == PieceType.ROOK) {
                         if (!isKingPawnTrap(this.board, this.playerKing, 52)) {
                             //Adds castling moves
                             kingCastles.add(new KingSideCastleMove(this.board, this.playerKing, 62,
-                                    (Rook) rookPiece, rookPiece.getPiecePosition(), 62));
+                                    (Rook) rookPiece, rookPiece.getPiecePosition(), 61));
                         }
                     }
                 }
@@ -78,7 +84,6 @@ public class WhitePlayer extends Player {
                 }
             }
         }
-
         return ImmutableList.copyOf(kingCastles);
     }
 }

@@ -64,7 +64,7 @@ public abstract class Piece {
     public PieceType getPieceType() {
         return this.pieceType;
     }
-    public abstract Collection<Move> calculateLegalMoves(final Board board);
+    public abstract Collection<Move> calculateLegals(final Board board);
 
     public abstract Piece movePiece(Move move);
 

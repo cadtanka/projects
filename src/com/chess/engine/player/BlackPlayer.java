@@ -18,8 +18,8 @@ import static com.chess.engine.board.BoardUtils.isKingPawnTrap;
 
 public class BlackPlayer extends Player {
     public BlackPlayer(final Board board,
-                       final Collection<Move> whiteLegalMoves,
-                       final Collection<Move> blackLegalMoves) {
+                       final Collection<Move> blackLegalMoves,
+                       final Collection<Move> whiteLegalMoves) {
         super(board, blackLegalMoves, whiteLegalMoves);
     }
 
@@ -39,7 +39,12 @@ public class BlackPlayer extends Player {
     }
 
     @Override
-    protected Collection<Move> calculateKingCastles(final Collection<Move> playerLegals, final Collection<Move> opponentLegals) {
+    public String toString() {
+        return "Black";
+    }
+
+    @Override
+    public Collection<Move> calculateKingCastles(final Collection<Move> opponentLegals) {
         final List<Move> kingCastles = new ArrayList<>();
         if(this.playerKing.isFirstMove() && !this.inCheck()) {
             //Specific to black king side castle
@@ -51,7 +56,6 @@ public class BlackPlayer extends Player {
                             Player.calculateAttackOnTile(6, opponentLegals).isEmpty() &&
                             rookTile.getPiece().getPieceType().isRook()) {
                         if (!isKingPawnTrap(this.board, this.playerKing, 12)) {
-
                             //Adds castling moves
                             kingCastles.add(new KingSideCastleMove(this.board, this.playerKing, 6,
                                     (Rook) rookTile.getPiece(), rookTile.getTileCoordinate(), 5));
@@ -70,7 +74,7 @@ public class BlackPlayer extends Player {
                         Player.calculateAttackOnTile(2, opponentLegals).isEmpty() &&
                         Player.calculateAttackOnTile(3, opponentLegals).isEmpty() &&
                         rookTile.getPiece().getPieceType().isRook()) {
-                    if (isKingPawnTrap(this.board, this.playerKing, 12)) {
+                    if (!isKingPawnTrap(this.board, this.playerKing, 12)) {
                         kingCastles.add(new QueenSideCastleMove(this.board, this.playerKing, 2,
                                 (Rook) rookTile.getPiece(), rookTile.getTileCoordinate(), 3));
                     }

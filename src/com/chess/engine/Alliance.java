@@ -21,7 +21,7 @@ public enum Alliance {
         }
 
         public boolean isBlack() {
-            return true;
+            return false;
         }
 
         @Override
@@ -47,7 +47,7 @@ public enum Alliance {
         }
 
         public boolean isWhite() {
-            return true;
+            return false;
         }
 
         public boolean isBlack() {

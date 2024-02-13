@@ -10,6 +10,8 @@ import com.google.common.collect.Iterables;
 
 import java.util.*;
 
+import static com.chess.engine.pieces.Piece.PieceType.KING;
+
 public class Board {
 
     private final List<ChessTile> gameBoard;
@@ -19,6 +21,7 @@ public class Board {
     private final BlackPlayer blackPlayer;
     private final Pawn enPassantPawn;
     private final Player currentPlayer;
+   // private final Collection<Move> kingMoves;
 
     private Board(final Builder builder) {
         this.gameBoard = createGameBoard(builder);
@@ -30,8 +33,12 @@ public class Board {
         final Collection<Move> blackLegalMoves = calculateLegalMoves(this.blackPieces);
 
         this.whitePlayer = new WhitePlayer(this, whiteLegalMoves, blackLegalMoves);
-        this.blackPlayer = new BlackPlayer(this, whiteLegalMoves, blackLegalMoves);
+        this.blackPlayer = new BlackPlayer(this, blackLegalMoves, whiteLegalMoves);
         this.currentPlayer = builder.nextMoveMaker.choosePlayer(this.whitePlayer, this.blackPlayer);
+
+        //this.kingMoves = this.currentPlayer.calculateKingCastles(this.currentPlayer.getOpponent().getLegalMoves());
+        //System.out.println("King at constructor" + kingMoves);
+        //System.out.println(currentPlayer);
     }
 
     @Override
@@ -55,7 +62,7 @@ public class Board {
         return this.blackPlayer;
     }
 
-    public Player currentPlayer() {
+    public Player getCurrentPlayer() {
         return this.currentPlayer;
     }
 
@@ -72,11 +79,27 @@ public class Board {
     }
 
     private Collection<Move> calculateLegalMoves(Collection<Piece> pieces) {
+        //TODO: Need to add the kings move to this list
+        //System.out.println("At calculate legal moves:" + currentPlayer);
         List<Move> legalMoveList = new ArrayList<>();
         for(Piece piece : pieces) {
-            legalMoveList.addAll(piece.calculateLegalMoves(this));
+//            if(this.currentPlayer.getAlliance().isBlack() || this.currentPlayer.getAlliance().isWhite()) {
+//                Collection<Move> kingMoves = this.getCurrentPlayer().calculateKingCastles(this.getCurrentPlayer().getOpponent().getLegalMoves());
+//                legalMoveList.addAll(kingMoves);
+//            }
+            for(Move move : piece.calculateLegals(this)) {
+                //if(piece.getPieceType().isKing() && move.get)
+                legalMoveList.add(move);
+            }
         }
-        return ImmutableList.copyOf(legalMoveList);
+
+//        if(this.kingMoves != null) {
+//            legalMoveList.addAll(this.kingMoves);
+//        }
+
+        //System.out.println("King moves at calculateLegalMoves" + this.kingMoves);
+
+        return legalMoveList;
     }
 
     private static Collection<Piece> calculateActivePieces(final List<ChessTile> gameBoard, final Alliance alliance) {
@@ -123,7 +146,7 @@ public class Board {
         builder.setPiece(new Knight(1, Alliance.BLACK));
         builder.setPiece(new Bishop(2, Alliance.BLACK));
         builder.setPiece(new Queen(3, Alliance.BLACK));
-        builder.setPiece(new King(4, Alliance.BLACK));
+        builder.setPiece(new King(4, Alliance.BLACK, true, false, false));
         builder.setPiece(new Bishop(5, Alliance.BLACK));
         builder.setPiece(new Knight(6, Alliance.BLACK));
         builder.setPiece(new Rook(7, Alliance.BLACK));
@@ -137,7 +160,7 @@ public class Board {
         builder.setPiece(new Knight(57, Alliance.WHITE));
         builder.setPiece(new Bishop(58, Alliance.WHITE ));
         builder.setPiece(new Queen(59, Alliance.WHITE));
-        builder.setPiece(new King(60, Alliance.WHITE));
+        builder.setPiece(new King(60, Alliance.WHITE, true, false, false));
         builder.setPiece(new Bishop(61, Alliance.WHITE));
         builder.setPiece(new Knight(62, Alliance.WHITE));
         builder.setPiece(new Rook(63, Alliance.WHITE));
@@ -164,8 +187,9 @@ public class Board {
             this.boardConfig.put(piece.getPiecePosition(), piece);
         }
 
-        public void setMoveMaker(final Alliance nextMoveMaker) {
+        public Builder setMoveMaker(final Alliance nextMoveMaker) {
             this.nextMoveMaker = nextMoveMaker;
+            return this;
         }
 
         public Board build() {

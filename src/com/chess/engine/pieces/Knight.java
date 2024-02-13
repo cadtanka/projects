@@ -27,7 +27,7 @@ public class Knight extends Piece {
     }
 
     @Override
-    public Collection<Move> calculateLegalMoves(final Board board) {
+    public Collection<Move> calculateLegals(final Board board) {
 
         List<Move> legalMoves = new ArrayList<>();
 

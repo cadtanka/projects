@@ -173,7 +173,7 @@ public class Table {
                             //Get the possible ways you can move the selected piece
                             destinationTile = chessBoard.getTile(tileId);
                             final Move move = Move.MoveFactory.createMove(chessBoard, sourceTile.getTileCoordinate(), destinationTile.getTileCoordinate());
-                            final MoveTransition transition = chessBoard.currentPlayer().makeMove(move);
+                            final MoveTransition transition = chessBoard.getCurrentPlayer().makeMove(move);
                             if(transition.getMoveStatus().isDone()) {
                                 chessBoard = transition.getTransitionBoard();
                                 moveLog.addMove(move);
@@ -264,8 +264,8 @@ public class Table {
     }
 
     private Collection<Move> pieceLegalMoves(Board board) {
-        if(humanMovedPiece != null && humanMovedPiece.getAlliance() == board.currentPlayer().getAlliance()) {
-            return humanMovedPiece.calculateLegalMoves(board);
+        if(humanMovedPiece != null && humanMovedPiece.getAlliance() == board.getCurrentPlayer().getAlliance()) {
+            return humanMovedPiece.calculateLegals(board);
         }
         return Collections.emptyList();
     }
