@@ -6,6 +6,8 @@ import com.chess.engine.board.BoardUtils;
 import com.chess.engine.board.Move;
 import com.chess.engine.pieces.King;
 import com.chess.engine.player.MoveTransition;
+import com.chess.engine.player.ai.MiniMax;
+import com.chess.engine.player.ai.MoveStrategy;
 import org.junit.jupiter.api.Test;
 
 import static com.chess.engine.board.Board.*;
@@ -87,5 +89,40 @@ class TestBoard {
         assertEquals(BoardUtils.getPositionAtCoordinate(5), "f8");
         assertEquals(BoardUtils.getPositionAtCoordinate(6), "g8");
         assertEquals(BoardUtils.getPositionAtCoordinate(7), "h8");
+    }
+
+    @Test
+    public void testFoolsMate() {
+        final Board board = Board.createStandardBoard();
+        Move move1 = Move.MoveFactory.createMove(board, BoardUtils.getCoordinateAtPosition("f2"),
+                BoardUtils.getCoordinateAtPosition("f3"));
+
+        final MoveTransition t1 = board.getCurrentPlayer().makeMove(move1);
+
+        assertTrue(t1.getMoveStatus().isDone());
+
+        Move move2 = Move.MoveFactory.createMove(t1.getTransitionBoard(), BoardUtils.getCoordinateAtPosition("e7"),
+                BoardUtils.getCoordinateAtPosition("e5"));
+
+        final MoveTransition t2 = t1.getTransitionBoard().getCurrentPlayer().makeMove(move2);
+
+        assertTrue(t2.getMoveStatus().isDone());
+
+        Move move3 = Move.MoveFactory.createMove(t2.getTransitionBoard(), BoardUtils.getCoordinateAtPosition("g2"),
+                BoardUtils.getCoordinateAtPosition("g4"));
+
+        final MoveTransition t3 = t2.getTransitionBoard().getCurrentPlayer().makeMove(move3);
+
+        assertTrue(t3.getMoveStatus().isDone());
+
+        final MoveStrategy strategy = new MiniMax(4);
+
+        final Move aiMove = strategy.execute(t3.getTransitionBoard());
+
+        final Move bestMove = Move.MoveFactory.createMove(t3.getTransitionBoard(), BoardUtils.getCoordinateAtPosition("d8"),
+                BoardUtils.getCoordinateAtPosition("h4"));
+
+        assertEquals(aiMove, bestMove);
+
     }
 }

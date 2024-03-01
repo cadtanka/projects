@@ -163,6 +163,13 @@ public class BoardUtils {
         }
     }
 
+    public static boolean isFirstColumn(int piecePosition) {
+        return piecePosition % 8 == 0;
+    }
+
+    public static boolean isEighthColumn(int piecePosition) {
+        return piecePosition % 8 == 7;
+    }
     public static boolean isKingPawnTrap(final Board board, final King king, final int frontTile) {
         final Piece piece = board.getTile(frontTile).getPiece();
         return piece != null && piece.getPieceType() == Piece.PieceType.PAWN &&

@@ -8,6 +8,7 @@ import com.chess.engine.board.Move;
 import com.chess.engine.board.Move.MajorAttackMove;
 import com.chess.engine.board.Move.MajorMove;
 import com.chess.engine.player.MoveStatus;
+import com.chess.engine.player.MoveTransition;
 import com.chess.engine.player.Player;
 import com.google.common.collect.ImmutableList;
 
@@ -23,12 +24,18 @@ public class King extends Piece {
     private final boolean kingSideCastleCapable;
     private final boolean queenSideCastleCapable;
 
+    private final Alliance pieceAlliance;
+
+    private final int piecePosition;
+
     public King(final int piecePosition, final Alliance pieceAlliance,
                 final boolean kingSideCastleCapable, final boolean queenSideCastleCapable) {
         super(PieceType.KING, piecePosition, pieceAlliance, true);
         this.isCastled = false;
         this.kingSideCastleCapable = kingSideCastleCapable;
         this.queenSideCastleCapable = queenSideCastleCapable;
+        this.pieceAlliance = pieceAlliance;
+        this.piecePosition = piecePosition;
     }
 
     public King(final int piecePosition, final Alliance pieceAlliance, final boolean isFirstMove,
@@ -37,39 +44,45 @@ public class King extends Piece {
         this.isCastled = false;
         this.kingSideCastleCapable = kingSideCastleCapable;
         this.queenSideCastleCapable = queenSideCastleCapable;
+        this.pieceAlliance = pieceAlliance;
+        this.piecePosition = piecePosition;
     }
 
     @Override
-    public Collection<Move> calculateLegals(Board board) {
+    public Collection<Move> calculateLegals(final Board board) {
+
         List<Move> legalMoves = new ArrayList<>();
         Collection<Move> opponentLegals = new ArrayList<>();
-        //MoveStatus moveTransition = MoveStatus.ILLEGAL_MOVE;
 
         if(board.getCurrentPlayer() != null) {
             opponentLegals = board.getCurrentPlayer().getOpponent().getLegalMoves();
-            //final Move move = new MajorMove(board, this, move_Coordinate);
-            //moveTransition = board.currentPlayer().makeMove(move).getMoveStatus();
         }
 
-        /*
-        TODO: Pawns attacks are still seen as valid move spaces for king
-        */
         for (int currSpot : MOVE_COORDINATES) {
+
+            if(isFirstColumnExclusion(this.piecePosition, currSpot) || isEighthColumnExclusion(this.piecePosition, currSpot)) {
+                continue;
+            }
+
             final int move_Coordinate = this.piecePosition + currSpot;
+            Move move = new MajorMove(board, this, move_Coordinate);
+
+            if(board.getPawnGhostMoves() != null && board.getPawnGhostMoves().contains(move_Coordinate)) {
+                continue;
+            }
 
             if (BoardUtils.isValidTileCoordinate(move_Coordinate)) {
 
                 final ChessTile move_Tile = board.getTile(move_Coordinate);
 
                 if (calculateAttackOnTile(move_Coordinate, opponentLegals).isEmpty()) {
-                    //&& checkForPawn(board, move_Coordinate)
                     if (!move_Tile.isOccupied()) {
-                        legalMoves.add(new MajorMove(board, this, move_Coordinate));
+                        legalMoves.add(move);
                     } else {
                         final Piece pieceAtCoordinate = move_Tile.getPiece();
-                        final Alliance pieceAlliance = pieceAtCoordinate.getAlliance();
+                        final Alliance pieceAllianceAtSpot = pieceAtCoordinate.getAlliance();
 
-                        if (this.pieceAlliance != pieceAlliance) {
+                        if (this.pieceAlliance != pieceAllianceAtSpot) {
                             legalMoves.add(new MajorAttackMove(board, this, move_Coordinate, pieceAtCoordinate));
                         }
                     }
@@ -80,13 +93,26 @@ public class King extends Piece {
         if(board.getCurrentPlayer() != null) {
             if (board.getCurrentPlayer().getAlliance().isWhite()) {
                 legalMoves.addAll(calculateKingCastlesWhite(opponentLegals, board));
-                System.out.println(calculateKingCastlesWhite(opponentLegals, board));
             } else if (board.getCurrentPlayer().getAlliance().isBlack()) {
                 legalMoves.addAll(calculateKingCastlesBlack(opponentLegals, board));
             }
         }
 
         return ImmutableList.copyOf(legalMoves);
+    }
+
+    private boolean moveIntoCheck(Move move, Board board) {
+        Move moveBack = new MajorMove(board, move.getMovedPiece(), move.getDestinationCoordinate());
+
+        if(board.getCurrentPlayer() != null) {
+            final MoveTransition transition = board.getCurrentPlayer().makeMove(move);
+            if(transition.getMoveStatus().isDone()) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+        return false;
     }
 
     public Collection<Move> calculateKingCastlesWhite(Collection<Move> opponentLegals, Board board) {
@@ -131,6 +157,8 @@ public class King extends Piece {
         }
         return ImmutableList.copyOf(kingCastles);
     }
+
+    //TODO: GUI DOESNT SHOW KING CAN MOVE INFRONT OF PAWNS
 
     public Collection<Move> calculateKingCastlesBlack(Collection<Move> opponentLegals, Board board) {
         final List<Move> kingCastles = new ArrayList<>();

@@ -44,22 +44,42 @@ class PlayerTest {
     public void inStaleMate() {
         Board.Builder builder = new Board.Builder();
 
-        builder.setPiece(new King(56, Alliance.BLACK, true,false, false));
+        builder.setPiece(new King(4, Alliance.BLACK, true,false, false));
         builder.setPiece(new King(60, Alliance.WHITE, true, false, false));
-        builder.setPiece(new Queen(41, Alliance.WHITE));
+        builder.setPiece(new Knight(20, Alliance.WHITE));
+        builder.setPiece(new Rook(8, Alliance.WHITE));
+
         builder.setMoveMaker(Alliance.WHITE);
 
         Board board = builder.build();
 
-        assertTrue(board.getCurrentPlayer().getOpponent().inStaleMate());
+        Move move = MoveFactory.createMove(board, 8, 9);
+        MoveTransition moveTransition = board.getCurrentPlayer().makeMove(move);
+
+        assertTrue(moveTransition.getTransitionBoard().getCurrentPlayer().inStaleMate());
+    }
+
+    @Test
+    public void notInStaleMate() {
+        Board.Builder builder = new Board.Builder();
+
+        builder.setPiece(new King(56, Alliance.BLACK, true,false, false));
+        builder.setPiece(new King(60, Alliance.WHITE, true, false, false));
+        builder.setPiece(new Queen(40, Alliance.WHITE));
+        builder.setMoveMaker(Alliance.WHITE);
+
+        Board board = builder.build();
+
+        assertFalse(board.getCurrentPlayer().getOpponent().inStaleMate());
     }
 
     @Test
     public void inCheckMate() {
         Board.Builder builder = new Board.Builder();
 
-        builder.setPiece(new King(56, Alliance.BLACK, true,false, false));
-        builder.setPiece(new King(60, Alliance.WHITE, true, false, false));
+        builder.setPiece(new King(56, Alliance.BLACK, false,false, false));
+        builder.setPiece(new King(60, Alliance.WHITE, false, false, false));
+        builder.setPiece(new Rook(1, Alliance.WHITE));
         builder.setPiece(new Queen(50, Alliance.WHITE));
         builder.setMoveMaker(Alliance.WHITE);
 
@@ -224,12 +244,12 @@ class PlayerTest {
     }
 
     @Test
-    public void pawnEnPassant() {
+    public void pawnEnPassant9Steps() {
         Board.Builder builder = new Board.Builder();
 
         builder.setPiece(new King(4, Alliance.BLACK, true,false, false));
         builder.setPiece(new King(60, Alliance.WHITE, true, false, false));
-        builder.setPiece(new Pawn(40, Alliance.BLACK));
+        builder.setPiece(new Pawn(32, Alliance.BLACK));
         builder.setPiece(new Pawn(49, Alliance.WHITE));
         builder.setMoveMaker(Alliance.WHITE);
 
@@ -238,10 +258,31 @@ class PlayerTest {
         Move move = MoveFactory.createMove(board, 49, 33);
         MoveTransition moveTransition = board.getCurrentPlayer().makeMove(move);
 
-        Move move1 = MoveFactory.createMove(moveTransition.getTransitionBoard(), 40, 49);
+        Move move1 = MoveFactory.createMove(moveTransition.getTransitionBoard(), 32, 41);
         MoveTransition moveTransition1 = moveTransition.getTransitionBoard().getCurrentPlayer().makeMove(move1);
         assertTrue(moveTransition1.getMoveStatus().isDone());
     }
+
+    @Test
+    public void pawnEnPassant7Steps() {
+        Board.Builder builder = new Board.Builder();
+
+        builder.setPiece(new King(4, Alliance.BLACK, true,false, false));
+        builder.setPiece(new King(60, Alliance.WHITE, true, false, false));
+        builder.setPiece(new Pawn(37, Alliance.BLACK));
+        builder.setPiece(new Pawn(52, Alliance.WHITE));
+        builder.setMoveMaker(Alliance.WHITE);
+
+        Board board = builder.build();
+
+        Move move = MoveFactory.createMove(board, 52, 36);
+        MoveTransition moveTransition = board.getCurrentPlayer().makeMove(move);
+
+        Move move1 = MoveFactory.createMove(moveTransition.getTransitionBoard(), 37, 44);
+        MoveTransition moveTransition1 = moveTransition.getTransitionBoard().getCurrentPlayer().makeMove(move1);
+        assertTrue(moveTransition1.getMoveStatus().isDone());
+    }
+
 
     @Test
     public void pawnJump() {
@@ -250,6 +291,7 @@ class PlayerTest {
         builder.setPiece(new King(4, Alliance.BLACK, true,false, false));
         builder.setPiece(new King(60, Alliance.WHITE, true, false, false));
         builder.setPiece(new Pawn(48, Alliance.WHITE));
+        builder.setMoveMaker(Alliance.WHITE);
 
         Board board = builder.build();
 
@@ -262,5 +304,66 @@ class PlayerTest {
         assertFalse(moveTransition1.getMoveStatus().isDone());
     }
 
+    @Test
+    public void pawnEdgeCase1() {
+        Board.Builder builder = new Board.Builder();
+        builder.setPiece(new King(4, Alliance.BLACK, true,false, false));
+        builder.setPiece(new King(60, Alliance.WHITE, true, false, false));
+        builder.setPiece(new Pawn(24, Alliance.BLACK, false));
+        builder.setPiece(new Pawn(31, Alliance.WHITE, false));
+        builder.setMoveMaker(Alliance.WHITE);
+
+        Board board = builder.build();
+
+        assertEquals(6, board.getCurrentPlayer().getLegalMoves().size());
+        assertEquals(6, board.getCurrentPlayer().getOpponent().getLegalMoves().size());
+    }
+
+    @Test
+    public void pawnEdgeCase2() {
+        Board.Builder builder = new Board.Builder();
+        builder.setPiece(new King(4, Alliance.BLACK, true,false, false));
+        builder.setPiece(new King(60, Alliance.WHITE, true, false, false));
+        builder.setPiece(new Pawn(7, Alliance.BLACK, false));
+        builder.setPiece(new Pawn(16, Alliance.WHITE, false));
+        builder.setMoveMaker(Alliance.WHITE);
+
+        Board board = builder.build();
+
+        assertEquals(6, board.getCurrentPlayer().getLegalMoves().size());
+        assertEquals(6, board.getCurrentPlayer().getOpponent().getLegalMoves().size());
+
+    }
+
+    @Test
+    public void pawnEdgeCase3() {
+        Board.Builder builder = new Board.Builder();
+        builder.setPiece(new King(4, Alliance.BLACK, true,false, false));
+        builder.setPiece(new King(60, Alliance.WHITE, true, false, false));
+        builder.setPiece(new Pawn(24, Alliance.BLACK, false));
+        builder.setPiece(new Pawn(31, Alliance.WHITE, false));
+        builder.setMoveMaker(Alliance.WHITE);
+
+        Board board = builder.build();
+
+        assertEquals(6,board.getCurrentPlayer().getLegalMoves().size());
+        assertEquals(6,board.getCurrentPlayer().getOpponent().getLegalMoves().size());
+
+    }
+
+    @Test
+    public void kingEdgeCase() {
+        Board.Builder builder = new Board.Builder();
+        builder.setPiece(new King(16, Alliance.BLACK, true,false, false));
+        builder.setPiece(new King(39, Alliance.WHITE, true, false, false));
+        builder.setPiece(new Pawn(23, Alliance.BLACK));
+        builder.setMoveMaker(Alliance.WHITE);
+
+        Board board = builder.build();
+
+        assertEquals(5, board.getCurrentPlayer().getLegalMoves().size());
+        assertEquals(6,board.getCurrentPlayer().getOpponent().getLegalMoves().size());
+
+    }
 
 }

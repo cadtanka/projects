@@ -3,15 +3,13 @@ package com.chess.engine.board;
 import com.chess.engine.Alliance;
 import com.chess.engine.pieces.*;
 import com.chess.engine.player.BlackPlayer;
+import com.chess.engine.player.MoveTransition;
 import com.chess.engine.player.Player;
 import com.chess.engine.player.WhitePlayer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 
 import java.util.*;
-
-import static com.chess.engine.pieces.Piece.PieceType.KING;
-
 public class Board {
 
     private final List<ChessTile> gameBoard;
@@ -21,7 +19,7 @@ public class Board {
     private final BlackPlayer blackPlayer;
     private final Pawn enPassantPawn;
     private final Player currentPlayer;
-   // private final Collection<Move> kingMoves;
+    private final Collection<Integer> pawnGhostMoves;
 
     private Board(final Builder builder) {
         this.gameBoard = createGameBoard(builder);
@@ -34,11 +32,29 @@ public class Board {
 
         this.whitePlayer = new WhitePlayer(this, whiteLegalMoves, blackLegalMoves);
         this.blackPlayer = new BlackPlayer(this, blackLegalMoves, whiteLegalMoves);
-        this.currentPlayer = builder.nextMoveMaker.choosePlayer(this.whitePlayer, this.blackPlayer);
 
-        //this.kingMoves = this.currentPlayer.calculateKingCastles(this.currentPlayer.getOpponent().getLegalMoves());
-        //System.out.println("King at constructor" + kingMoves);
-        //System.out.println(currentPlayer);
+        this.currentPlayer = builder.nextMoveMaker.choosePlayer(this.whitePlayer, this.blackPlayer);
+        this.pawnGhostMoves = pawnGhostMoves();
+    }
+
+    public List<Integer> pawnGhostMoves() {
+        List<Integer> pawnMoves = new ArrayList<>();
+        for(Piece piece : this.getCurrentPlayer().getOpponent().getActivePieces()) {
+
+            if(piece.getPieceType().isPawn()) {
+                int sevenForward = piece.getPiecePosition() + (piece.getAlliance().getDirection() * 7);
+                int nineForward = piece.getPiecePosition() + (piece.getAlliance().getDirection() * 9);
+
+                if(sevenForward <= BoardUtils.NUM_TILES && sevenForward >= 0) {
+                    pawnMoves.add(sevenForward);
+                }
+
+                if(nineForward <= BoardUtils.NUM_TILES && nineForward >= 0) {
+                    pawnMoves.add(nineForward);
+                }
+            }
+        }
+        return pawnMoves;
     }
 
     @Override
@@ -66,6 +82,10 @@ public class Board {
         return this.currentPlayer;
     }
 
+    public Collection<Integer> getPawnGhostMoves() {
+        return this.pawnGhostMoves;
+    }
+
     public Pawn getEnPassantPawn() {
         return this.enPassantPawn;
     }
@@ -79,25 +99,13 @@ public class Board {
     }
 
     private Collection<Move> calculateLegalMoves(Collection<Piece> pieces) {
-        //TODO: Need to add the kings move to this list
-        //System.out.println("At calculate legal moves:" + currentPlayer);
         List<Move> legalMoveList = new ArrayList<>();
+
         for(Piece piece : pieces) {
-//            if(this.currentPlayer.getAlliance().isBlack() || this.currentPlayer.getAlliance().isWhite()) {
-//                Collection<Move> kingMoves = this.getCurrentPlayer().calculateKingCastles(this.getCurrentPlayer().getOpponent().getLegalMoves());
-//                legalMoveList.addAll(kingMoves);
-//            }
             for(Move move : piece.calculateLegals(this)) {
-                //if(piece.getPieceType().isKing() && move.get)
                 legalMoveList.add(move);
             }
         }
-
-//        if(this.kingMoves != null) {
-//            legalMoveList.addAll(this.kingMoves);
-//        }
-
-        //System.out.println("King moves at calculateLegalMoves" + this.kingMoves);
 
         return legalMoveList;
     }

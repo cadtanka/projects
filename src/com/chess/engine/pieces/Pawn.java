@@ -53,7 +53,8 @@ public class Pawn extends Piece {
                     legalMoves.add(new PawnJump(board, this, move_Coordinate));
                 }
 
-            } else if (currSpot == 7) {
+            } else if (currSpot == 7 && !((this.getAlliance().isBlack() && BoardUtils.FIRST_COLUMN[this.piecePosition]) ||
+                    (this.getAlliance().isWhite() && BoardUtils.EIGHTH_COLUMN[this.piecePosition]))) {
                 if(move_Tile.isOccupied()) {
                     final Piece pieceAtCoordinate = move_Tile.getPiece();
                     if (this.pieceAlliance != pieceAtCoordinate.pieceAlliance) {
@@ -72,21 +73,22 @@ public class Pawn extends Piece {
                     }
                 }
             //TODO: Put in new method
-            } else if (currSpot == 9) {
+            } else if (currSpot == 9 && !((this.getAlliance().isWhite() && BoardUtils.FIRST_COLUMN[this.piecePosition]) ||
+                    (this.getAlliance().isBlack() && BoardUtils.EIGHTH_COLUMN[this.piecePosition]))) {
                 if(move_Tile.isOccupied()) {
                     final Piece pieceAtCoordinate = move_Tile.getPiece();
-                    if (this.pieceAlliance != pieceAtCoordinate.pieceAlliance && move_Tile.isOccupied()) {
+                    if (this.pieceAlliance != pieceAtCoordinate.pieceAlliance) {
                         if (this.pieceAlliance.isPawnPromotionSquare(move_Coordinate)) {
                             legalMoves.add(new PawnPromotion(new PawnAttackMove(board, this, move_Coordinate, pieceAtCoordinate)));
                         } else {
                             legalMoves.add(new PawnAttackMove(board, this, move_Coordinate, pieceAtCoordinate));
                         }
-                    } else if (board.getEnPassantPawn() != null) {
-                        if (board.getEnPassantPawn().getPiecePosition() == (this.piecePosition - (this.pieceAlliance.getOppositeDirection()))) {
-                            final Piece enPassantPawn = board.getEnPassantPawn();
-                            if (this.pieceAlliance != enPassantPawn.getAlliance()) {
-                                legalMoves.add(new PawnEnPassantAttackMove(board, this, move_Coordinate, enPassantPawn));
-                            }
+                    }
+                } else if (board.getEnPassantPawn() != null) {
+                    if (board.getEnPassantPawn().getPiecePosition() == (this.piecePosition - (this.pieceAlliance.getOppositeDirection()))) {
+                        final Piece enPassantPawn = board.getEnPassantPawn();
+                        if (this.pieceAlliance != enPassantPawn.getAlliance()) {
+                            legalMoves.add(new PawnEnPassantAttackMove(board, this, move_Coordinate, enPassantPawn));
                         }
                     }
                 }
@@ -96,14 +98,24 @@ public class Pawn extends Piece {
     }
 
     //TODO: To fix bug that GUI displays a king can move into a pawn's attack square
-    public Collection<Integer> ghostAttack(final Board board) {
-        List<Integer> ghostReturn = new ArrayList<>();
-        for(final int currSpot : ghost_Attack_Moves) {
-            int move_Coordinate = this.piecePosition + (this.pieceAlliance.getDirection() * currSpot);
-            ghostReturn.add(move_Coordinate);
-        }
-        return ImmutableList.copyOf(ghostReturn);
-    }
+//    public static Collection<Integer> ghostAttack(final Collection<Piece> pieces) {
+//        List<Integer> ghostReturn = new ArrayList<>();
+//
+//        for(Piece piece : pieces) {
+//
+//            if(piece.getPieceType().isPawn()) {
+//                for (final int currSpot : ghost_Attack_Moves) {
+//                    int move_Coordinate = piece.piecePosition + (piece.pieceAlliance.getDirection() * currSpot);
+//                    final ChessTile move_Tile = board.getTile(move_Coordinate);
+//
+//                    if (!move_Tile.isOccupied()) {
+//                        ghostReturn.add(move_Coordinate);
+//                    }
+//                }
+//            }
+//        }
+//        return ImmutableList.copyOf(ghostReturn);
+//    }
 
     @Override
     public String toString() {
