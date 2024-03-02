@@ -105,6 +105,13 @@ public abstract class Move {
         return null;
     }
 
+    public Board undo() {
+        final Board.Builder builder = new Builder();
+        this.board.getAllPieces().forEach(builder::setPiece);
+        builder.setMoveMaker(this.board.getCurrentPlayer().getAlliance());
+        return builder.build();
+    }
+
     public static final class MajorAttackMove extends AttackMove {
         public MajorAttackMove(final Board board, final Piece pieceMoved,
                                final int destination, final Piece pieceAttacked) {

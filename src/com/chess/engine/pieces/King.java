@@ -19,16 +19,16 @@ import static com.chess.engine.player.Player.calculateAttackOnTile;
 
 public class King extends Piece {
 
-    private static final int[] MOVE_COORDINATES = {7,8,9,1,-1,-7,-8,-9};
-    private final boolean isCastled;
     private final boolean kingSideCastleCapable;
     private final boolean queenSideCastleCapable;
+    private final boolean isCastled;
+    private static final int[] MOVE_COORDINATES = {7,8,9,1,-1,-7,-8,-9};
 
     private final Alliance pieceAlliance;
 
     private final int piecePosition;
 
-    public King(final int piecePosition, final Alliance pieceAlliance,
+    public King(final int piecePosition, final Alliance pieceAlliance, final boolean isCastled,
                 final boolean kingSideCastleCapable, final boolean queenSideCastleCapable) {
         super(PieceType.KING, piecePosition, pieceAlliance, true);
         this.isCastled = false;
@@ -38,7 +38,7 @@ public class King extends Piece {
         this.piecePosition = piecePosition;
     }
 
-    public King(final int piecePosition, final Alliance pieceAlliance, final boolean isFirstMove,
+    public King(final int piecePosition, final Alliance pieceAlliance, final boolean isFirstMove, final boolean isCastled,
                 final boolean kingSideCastleCapable, final boolean queenSideCastleCapable) {
         super(PieceType.KING, piecePosition, pieceAlliance, isFirstMove);
         this.isCastled = false;
@@ -46,6 +46,18 @@ public class King extends Piece {
         this.queenSideCastleCapable = queenSideCastleCapable;
         this.pieceAlliance = pieceAlliance;
         this.piecePosition = piecePosition;
+    }
+
+    public boolean isCastled() {
+        return this.isCastled;
+    }
+
+    public boolean isKingSideCastleCapable() {
+        return this.kingSideCastleCapable;
+    }
+
+    public boolean isQueenSideCastleCapable() {
+        return this.queenSideCastleCapable;
     }
 
     @Override
@@ -220,7 +232,8 @@ public class King extends Piece {
     //Could be optimized
     @Override
     public King movePiece(Move move) {
-        return new King(move.getDestinationCoordinate(), move.getMovedPiece().getAlliance(), false, false, false);
+        return new King(move.getDestinationCoordinate(), move.getMovedPiece().getAlliance(),
+                false, move.isCastling(), false, false);
     }
 
     private static boolean isFirstColumnExclusion(final int currentCandidate,

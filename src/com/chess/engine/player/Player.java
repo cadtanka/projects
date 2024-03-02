@@ -138,4 +138,16 @@ public abstract class Player {
     public abstract Alliance getAlliance();
     public abstract Player getOpponent();
     public abstract Collection<Move> calculateKingCastles(Collection<Move> opponentLegals);
+
+    public boolean isKingSideCastleCapable() {
+        return this.playerKing.isKingSideCastleCapable();
+    }
+
+    public boolean isQueenSideCastleCapable() {
+        return this.playerKing.isQueenSideCastleCapable();
+    }
+
+    public MoveTransition unMakeMove(final Move move) {
+        return new MoveTransition(this.board, move.undo(), move, MoveStatus.DONE);
+    }
 }
