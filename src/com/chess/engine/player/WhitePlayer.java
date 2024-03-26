@@ -2,7 +2,6 @@ package com.chess.engine.player;
 
 import com.chess.engine.Alliance;
 import com.chess.engine.board.Board;
-import com.chess.engine.board.BoardUtils;
 import com.chess.engine.board.ChessTile;
 import com.chess.engine.board.Move;
 import com.chess.engine.pieces.Piece;
@@ -57,7 +56,7 @@ public class WhitePlayer extends Player {
                     if(Player.calculateAttackOnTile(61, opponentLegals).isEmpty() &&
                         Player.calculateAttackOnTile(62, opponentLegals).isEmpty() &&
                         rookPiece.getPieceType() == PieceType.ROOK) {
-                        if (!isKingPawnTrap(this.board, this.playerKing, 52)) {
+                        if (isKingPawnTrap(this.board, this.playerKing, 52)) {
                             //Adds castling moves
                             kingCastles.add(new KingSideCastleMove(this.board, this.playerKing, 62,
                                     (Rook) rookPiece, rookPiece.getPiecePosition(), 61));
@@ -76,7 +75,7 @@ public class WhitePlayer extends Player {
                         Player.calculateAttackOnTile(58, opponentLegals).isEmpty() &&
                         Player.calculateAttackOnTile(59, opponentLegals).isEmpty() &&
                         rookTile.getPiece().getPieceType().isRook()) {
-                    if (!isKingPawnTrap(this.board, this.playerKing, 52)) {
+                    if (isKingPawnTrap(this.board, this.playerKing, 52)) {
                         kingCastles.add(new QueenSideCastleMove(this.board, this.playerKing, 58,
                                 (Rook) rookTile.getPiece(), rookTile.getTileCoordinate(), 59));
 

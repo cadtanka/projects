@@ -30,14 +30,14 @@ class PlayerTest {
         final Move move = MoveFactory.createMove(board,16,20);
         MoveTransition moveTransition = board.getCurrentPlayer().makeMove(move);
 
-        assertTrue(moveTransition.getTransitionBoard().getCurrentPlayer().inCheck());
-        assertFalse(moveTransition.getTransitionBoard().getCurrentPlayer().getOpponent().inCheck());
+        assertTrue(moveTransition.transitionBoard().getCurrentPlayer().inCheck());
+        assertFalse(moveTransition.transitionBoard().getCurrentPlayer().getOpponent().inCheck());
 
-        final Move move1 = MoveFactory.createMove(moveTransition.getTransitionBoard(), 20, 8);
+        final Move move1 = MoveFactory.createMove(moveTransition.transitionBoard(), 20, 8);
         MoveTransition moveTransition1 = board.getCurrentPlayer().makeMove(move1);
 
-        assertFalse(moveTransition1.getTransitionBoard().getCurrentPlayer().inCheck());
-        assertFalse(moveTransition1.getTransitionBoard().getCurrentPlayer().getOpponent().inCheck());
+        assertFalse(moveTransition1.transitionBoard().getCurrentPlayer().inCheck());
+        assertFalse(moveTransition1.transitionBoard().getCurrentPlayer().getOpponent().inCheck());
     }
 
     @Test
@@ -56,7 +56,7 @@ class PlayerTest {
         Move move = MoveFactory.createMove(board, 8, 9);
         MoveTransition moveTransition = board.getCurrentPlayer().makeMove(move);
 
-        assertTrue(moveTransition.getTransitionBoard().getCurrentPlayer().inStaleMate());
+        assertTrue(moveTransition.transitionBoard().getCurrentPlayer().inStaleMate());
     }
 
     @Test
@@ -90,7 +90,7 @@ class PlayerTest {
         Move move = MoveFactory.createMove(board, 50, 49);
         MoveTransition moveTransition = board.getCurrentPlayer().makeMove(move);
 
-        assertTrue(moveTransition.getTransitionBoard().getCurrentPlayer().inCheckMate());
+        assertTrue(moveTransition.transitionBoard().getCurrentPlayer().inCheckMate());
     }
 
     @Test
@@ -108,7 +108,7 @@ class PlayerTest {
         Move move = MoveFactory.createMove(board, 52, 43);
         MoveTransition moveTransition = board.getCurrentPlayer().makeMove(move);
 
-        assertFalse(moveTransition.getMoveStatus().isDone());
+        assertFalse(moveTransition.moveStatus().isDone());
     }
 
     @Test
@@ -126,7 +126,7 @@ class PlayerTest {
         Move move = MoveFactory.createMove(board, 60, 59);
         MoveTransition moveTransition = board.getCurrentPlayer().makeMove(move);
 
-        assertFalse(moveTransition.getMoveStatus().isDone());
+        assertFalse(moveTransition.moveStatus().isDone());
     }
 
     @Test
@@ -144,7 +144,7 @@ class PlayerTest {
         Move move = MoveFactory.createMove(board, 60, 58);
         MoveTransition moveTransition = board.getCurrentPlayer().makeMove(move);
 
-        assertFalse(moveTransition.getMoveStatus().isDone());
+        assertFalse(moveTransition.moveStatus().isDone());
         assertTrue(board.getCurrentPlayer().calculateKingCastles(board.getCurrentPlayer().getOpponent().getLegalMoves()).isEmpty());
     }
 
@@ -163,7 +163,7 @@ class PlayerTest {
         Move move = MoveFactory.createMove(board, 60, 58);
         MoveTransition moveTransition = board.getCurrentPlayer().makeMove(move);
 
-        assertFalse(moveTransition.getMoveStatus().isDone());
+        assertFalse(moveTransition.moveStatus().isDone());
         assertTrue(board.getCurrentPlayer().calculateKingCastles(board.getCurrentPlayer().getOpponent().getLegalMoves()).isEmpty());
     }
 
@@ -182,7 +182,7 @@ class PlayerTest {
         Move move = MoveFactory.createMove(board, 60, 62);
         MoveTransition moveTransition = board.getCurrentPlayer().makeMove(move);
 
-        assertFalse(moveTransition.getMoveStatus().isDone());
+        assertFalse(moveTransition.moveStatus().isDone());
         assertTrue(board.getCurrentPlayer().calculateKingCastles(board.getCurrentPlayer().getOpponent().getLegalMoves()).isEmpty());
     }
 
@@ -201,7 +201,7 @@ class PlayerTest {
         Move move = MoveFactory.createMove(board, 60, 62);
         MoveTransition moveTransition = board.getCurrentPlayer().makeMove(move);
 
-        assertFalse(moveTransition.getMoveStatus().isDone());
+        assertFalse(moveTransition.moveStatus().isDone());
         assertTrue(board.getCurrentPlayer().calculateKingCastles(board.getCurrentPlayer().getOpponent().getLegalMoves()).isEmpty());
     }
 
@@ -220,7 +220,7 @@ class PlayerTest {
         Move move = MoveFactory.createMove(board, 60, 62);
         MoveTransition moveTransition = board.getCurrentPlayer().makeMove(move);
 
-        assertTrue(moveTransition.getMoveStatus().isDone());
+        assertTrue(moveTransition.moveStatus().isDone());
         assertFalse(board.getCurrentPlayer().calculateKingCastles(board.getCurrentPlayer().getOpponent().getLegalMoves()).isEmpty());
     }
 
@@ -239,7 +239,7 @@ class PlayerTest {
         Move move = MoveFactory.createMove(board, 60, 58);
         MoveTransition moveTransition = board.getCurrentPlayer().makeMove(move);
 
-        assertTrue(moveTransition.getMoveStatus().isDone());
+        assertTrue(moveTransition.moveStatus().isDone());
         assertFalse(board.getCurrentPlayer().calculateKingCastles(board.getCurrentPlayer().getOpponent().getLegalMoves()).isEmpty());
     }
 
@@ -258,9 +258,9 @@ class PlayerTest {
         Move move = MoveFactory.createMove(board, 49, 33);
         MoveTransition moveTransition = board.getCurrentPlayer().makeMove(move);
 
-        Move move1 = MoveFactory.createMove(moveTransition.getTransitionBoard(), 32, 41);
-        MoveTransition moveTransition1 = moveTransition.getTransitionBoard().getCurrentPlayer().makeMove(move1);
-        assertTrue(moveTransition1.getMoveStatus().isDone());
+        Move move1 = MoveFactory.createMove(moveTransition.transitionBoard(), 32, 41);
+        MoveTransition moveTransition1 = moveTransition.transitionBoard().getCurrentPlayer().makeMove(move1);
+        assertTrue(moveTransition1.moveStatus().isDone());
     }
 
     @Test
@@ -278,9 +278,9 @@ class PlayerTest {
         Move move = MoveFactory.createMove(board, 52, 36);
         MoveTransition moveTransition = board.getCurrentPlayer().makeMove(move);
 
-        Move move1 = MoveFactory.createMove(moveTransition.getTransitionBoard(), 37, 44);
-        MoveTransition moveTransition1 = moveTransition.getTransitionBoard().getCurrentPlayer().makeMove(move1);
-        assertTrue(moveTransition1.getMoveStatus().isDone());
+        Move move1 = MoveFactory.createMove(moveTransition.transitionBoard(), 37, 44);
+        MoveTransition moveTransition1 = moveTransition.transitionBoard().getCurrentPlayer().makeMove(move1);
+        assertTrue(moveTransition1.moveStatus().isDone());
     }
 
 
@@ -297,11 +297,11 @@ class PlayerTest {
 
         Move move = MoveFactory.createMove(board, 48, 32);
         MoveTransition moveTransition = board.getCurrentPlayer().makeMove(move);
-        assertTrue(moveTransition.getMoveStatus().isDone());
+        assertTrue(moveTransition.moveStatus().isDone());
 
-        Move move1 = MoveFactory.createMove(moveTransition.getTransitionBoard(), 32, 16);
+        Move move1 = MoveFactory.createMove(moveTransition.transitionBoard(), 32, 16);
         MoveTransition moveTransition1 = board.getCurrentPlayer().getOpponent().makeMove(move1);
-        assertFalse(moveTransition1.getMoveStatus().isDone());
+        assertFalse(moveTransition1.moveStatus().isDone());
     }
 
     @Test

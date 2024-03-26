@@ -3,7 +3,6 @@ package com.chess.engine.board;
 import com.chess.engine.Alliance;
 import com.chess.engine.pieces.*;
 import com.chess.engine.player.BlackPlayer;
-import com.chess.engine.player.MoveTransition;
 import com.chess.engine.player.Player;
 import com.chess.engine.player.WhitePlayer;
 import com.google.common.collect.ImmutableList;
@@ -111,9 +110,7 @@ public class Board {
         List<Move> legalMoveList = new ArrayList<>();
 
         for(Piece piece : pieces) {
-            for(Move move : piece.calculateLegals(this)) {
-                legalMoveList.add(move);
-            }
+            legalMoveList.addAll(piece.calculateLegals(this));
         }
 
         return legalMoveList;
@@ -204,9 +201,8 @@ public class Board {
             this.boardConfig.put(piece.getPiecePosition(), piece);
         }
 
-        public Builder setMoveMaker(final Alliance nextMoveMaker) {
+        public void setMoveMaker(final Alliance nextMoveMaker) {
             this.nextMoveMaker = nextMoveMaker;
-            return this;
         }
 
         public Board build() {

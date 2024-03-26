@@ -7,7 +7,6 @@ import com.chess.engine.board.ChessTile;
 import com.chess.engine.board.Move;
 import com.chess.engine.board.Move.MajorAttackMove;
 import com.chess.engine.board.Move.MajorMove;
-import com.chess.engine.player.MoveStatus;
 import com.chess.engine.player.MoveTransition;
 import com.chess.engine.player.Player;
 import com.google.common.collect.ImmutableList;
@@ -17,6 +16,7 @@ import java.util.*;
 import static com.chess.engine.board.BoardUtils.isKingPawnTrap;
 import static com.chess.engine.player.Player.calculateAttackOnTile;
 
+/** @noinspection GrazieInspection*/
 public class King extends Piece {
 
     private final boolean kingSideCastleCapable;
@@ -31,7 +31,7 @@ public class King extends Piece {
     public King(final int piecePosition, final Alliance pieceAlliance, final boolean isCastled,
                 final boolean kingSideCastleCapable, final boolean queenSideCastleCapable) {
         super(PieceType.KING, piecePosition, pieceAlliance, true);
-        this.isCastled = false;
+        this.isCastled = isCastled;
         this.kingSideCastleCapable = kingSideCastleCapable;
         this.queenSideCastleCapable = queenSideCastleCapable;
         this.pieceAlliance = pieceAlliance;
@@ -41,7 +41,7 @@ public class King extends Piece {
     public King(final int piecePosition, final Alliance pieceAlliance, final boolean isFirstMove, final boolean isCastled,
                 final boolean kingSideCastleCapable, final boolean queenSideCastleCapable) {
         super(PieceType.KING, piecePosition, pieceAlliance, isFirstMove);
-        this.isCastled = false;
+        this.isCastled = isCastled;
         this.kingSideCastleCapable = kingSideCastleCapable;
         this.queenSideCastleCapable = queenSideCastleCapable;
         this.pieceAlliance = pieceAlliance;
@@ -104,32 +104,28 @@ public class King extends Piece {
 
         if(board.getCurrentPlayer() != null) {
             if (board.getCurrentPlayer().getAlliance().isWhite()) {
-                legalMoves.addAll(calculateKingCastlesWhite(opponentLegals, board));
+                legalMoves.addAll(calculateKingCastlesWhite(board));
             } else if (board.getCurrentPlayer().getAlliance().isBlack()) {
-                legalMoves.addAll(calculateKingCastlesBlack(opponentLegals, board));
+                legalMoves.addAll(calculateKingCastlesBlack(board));
             }
         }
 
         return ImmutableList.copyOf(legalMoves);
     }
 
+    //TODO: King thinks it can move into an attacked square
     private boolean moveIntoCheck(Move move, Board board) {
-        Move moveBack = new MajorMove(board, move.getMovedPiece(), move.getDestinationCoordinate());
 
         if(board.getCurrentPlayer() != null) {
             final MoveTransition transition = board.getCurrentPlayer().makeMove(move);
-            if(transition.getMoveStatus().isDone()) {
-                return false;
-            } else {
-                return true;
-            }
+            return !transition.moveStatus().isDone();
         }
         return false;
     }
 
-    public Collection<Move> calculateKingCastlesWhite(Collection<Move> opponentLegals, Board board) {
+    public Collection<Move> calculateKingCastlesWhite(Board board) {
         final List<Move> kingCastles = new ArrayList<>();
-        opponentLegals = board.getCurrentPlayer().getOpponent().getLegalMoves();
+        Collection<Move> opponentLegals = board.getCurrentPlayer().getOpponent().getLegalMoves();
 
         if (this.isFirstMove && calculateAttackOnTile(this.piecePosition, opponentLegals).isEmpty()) {
             //Specific to white king side castle
@@ -140,7 +136,7 @@ public class King extends Piece {
                     if (Player.calculateAttackOnTile(61, opponentLegals).isEmpty() &&
                             Player.calculateAttackOnTile(62, opponentLegals).isEmpty() &&
                             rookPiece.getPieceType() == PieceType.ROOK) {
-                        if (!isKingPawnTrap(board, this, 52)) {
+                        if (isKingPawnTrap(board, this, 52)) {
                             //Adds castling moves
                             kingCastles.add(new Move.KingSideCastleMove(board, this, 62,
                                     (Rook) rookPiece, rookPiece.getPiecePosition(), 61));
@@ -159,7 +155,7 @@ public class King extends Piece {
                         Player.calculateAttackOnTile(58, opponentLegals).isEmpty() &&
                         Player.calculateAttackOnTile(59, opponentLegals).isEmpty() &&
                         rookTile.getPiece().getPieceType().isRook()) {
-                    if (!isKingPawnTrap(board, this, 52)) {
+                    if (isKingPawnTrap(board, this, 52)) {
                         kingCastles.add(new Move.QueenSideCastleMove(board, this, 58,
                                 (Rook) rookTile.getPiece(), rookTile.getTileCoordinate(), 59));
 
@@ -170,11 +166,11 @@ public class King extends Piece {
         return ImmutableList.copyOf(kingCastles);
     }
 
-    //TODO: GUI DOESNT SHOW KING CAN MOVE INFRONT OF PAWNS
+    //TODO: GUI DOESN'T SHOW KING CAN MOVE IN FRONT OF PAWNS
 
-    public Collection<Move> calculateKingCastlesBlack(Collection<Move> opponentLegals, Board board) {
+    public Collection<Move> calculateKingCastlesBlack(Board board) {
         final List<Move> kingCastles = new ArrayList<>();
-        opponentLegals = board.getCurrentPlayer().getOpponent().getLegalMoves();
+        Collection<Move> opponentLegals = board.getCurrentPlayer().getOpponent().getLegalMoves();
 
         if (this.isFirstMove && calculateAttackOnTile(this.piecePosition, opponentLegals).isEmpty()) {
             //Specific to white king side castle
@@ -185,7 +181,7 @@ public class King extends Piece {
                     if (Player.calculateAttackOnTile(5, opponentLegals).isEmpty() &&
                             Player.calculateAttackOnTile(6, opponentLegals).isEmpty() &&
                             rookPiece.getPieceType() == PieceType.ROOK) {
-                        if (!isKingPawnTrap(board, this, 12)) {
+                        if (isKingPawnTrap(board, this, 12)) {
                             //Adds castling moves
                             kingCastles.add(new Move.KingSideCastleMove(board, this, 6,
                                     (Rook) rookPiece, rookPiece.getPiecePosition(), 5));
@@ -204,7 +200,7 @@ public class King extends Piece {
                         Player.calculateAttackOnTile(2, opponentLegals).isEmpty() &&
                         Player.calculateAttackOnTile(3, opponentLegals).isEmpty() &&
                         rookTile.getPiece().getPieceType().isRook()) {
-                    if (!isKingPawnTrap(board, this, 12)) {
+                    if (isKingPawnTrap(board, this, 12)) {
                         kingCastles.add(new Move.QueenSideCastleMove(board, this, 2,
                                 (Rook) rookTile.getPiece(), rookTile.getTileCoordinate(), 3));
 
@@ -215,14 +211,16 @@ public class King extends Piece {
         return ImmutableList.copyOf(kingCastles);
     }
 
-    public boolean checkForPawn(Board board, int move_Coordinate) {
-        final Move move = new MajorMove(board, this, move_Coordinate);
-        if(board.getCurrentPlayer() != null) {
-            MoveStatus moveTransition = board.getCurrentPlayer().makeMove(move).getMoveStatus();
-            return moveTransition.isDone();
-        }
-        return true;
-    }
+// --Commented out by Inspection START (3/2/24, 11:46 AM):
+//    public boolean checkForPawn(Board board, int move_Coordinate) {
+//        final Move move = new MajorMove(board, this, move_Coordinate);
+//        if(board.getCurrentPlayer() != null) {
+//            MoveStatus moveTransition = board.getCurrentPlayer().makeMove(move).getMoveStatus();
+//            return moveTransition.isDone();
+//        }
+//        return true;
+//    }
+// --Commented out by Inspection STOP (3/2/24, 11:46 AM)
 
     @Override
     public String toString() {

@@ -55,7 +55,7 @@ public class BlackPlayer extends Player {
                     if(Player.calculateAttackOnTile(5, opponentLegals).isEmpty() &&
                             Player.calculateAttackOnTile(6, opponentLegals).isEmpty() &&
                             rookTile.getPiece().getPieceType().isRook()) {
-                        if (!isKingPawnTrap(this.board, this.playerKing, 12)) {
+                        if (isKingPawnTrap(this.board, this.playerKing, 12)) {
                             //Adds castling moves
                             kingCastles.add(new KingSideCastleMove(this.board, this.playerKing, 6,
                                     (Rook) rookTile.getPiece(), rookTile.getTileCoordinate(), 5));
@@ -74,7 +74,7 @@ public class BlackPlayer extends Player {
                         Player.calculateAttackOnTile(2, opponentLegals).isEmpty() &&
                         Player.calculateAttackOnTile(3, opponentLegals).isEmpty() &&
                         rookTile.getPiece().getPieceType().isRook()) {
-                    if (!isKingPawnTrap(this.board, this.playerKing, 12)) {
+                    if (isKingPawnTrap(this.board, this.playerKing, 12)) {
                         kingCastles.add(new QueenSideCastleMove(this.board, this.playerKing, 2,
                                 (Rook) rookTile.getPiece(), rookTile.getTileCoordinate(), 3));
                     }

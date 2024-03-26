@@ -22,9 +22,11 @@ public class Knight extends Piece {
         super(PieceType.KNIGHT, piecePosition, pieceAlliance, true);
     }
 
-    public Knight(final int piecePosition, final Alliance pieceAlliance, final boolean isFirstMove) {
-        super(PieceType.KNIGHT, piecePosition, pieceAlliance, isFirstMove);
-    }
+// --Commented out by Inspection START (3/2/24, 11:50 AM):
+//    public Knight(final int piecePosition, final Alliance pieceAlliance, final boolean isFirstMove) {
+//        super(PieceType.KNIGHT, piecePosition, pieceAlliance, isFirstMove);
+//    }
+// --Commented out by Inspection STOP (3/2/24, 11:50 AM)
 
     @Override
     public Collection<Move> calculateLegals(final Board board) {

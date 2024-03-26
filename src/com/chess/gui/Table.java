@@ -30,6 +30,8 @@ public class Table extends Observable {
     private final TakenPiecesPanel takenPiecesPanel;
     private final BoardPanel boardPanel;
     private final MoveLog moveLog;
+    private String pgnString;
+    private int moveCounter;
     private final GameSetup gameSetup;
     private final JFrame gameFrame;
     private Board chessBoard;
@@ -45,7 +47,7 @@ public class Table extends Observable {
     private final Color lightTileColor = Color.decode("#FFFACD");
     private final Color darkTileColor = Color.decode("#593E1A");
     private static final Table INSTANCE = new Table();
-    private DebugPanel debugPanel;
+    private final DebugPanel debugPanel;
 
     public static Table get() {
         return INSTANCE;
@@ -69,6 +71,8 @@ public class Table extends Observable {
         this.takenPiecesPanel = new TakenPiecesPanel();
         this.boardPanel = new BoardPanel();
         this.moveLog = new MoveLog();
+        this.pgnString = "";
+        this.moveCounter = 1;
         this.debugPanel = new DebugPanel();
         this.addObserver(new TableGameAIWatcher());
         this.gameSetup = new GameSetup(this.gameFrame, true);
@@ -118,7 +122,7 @@ public class Table extends Observable {
     private void undoAllMoves() {
         for(int i = Table.get().getMoveLog().size() - 1; i >= 0; i--) {
             final Move lastMove = Table.get().getMoveLog().removeMove(Table.get().getMoveLog().size() - 1);
-            this.chessBoard = this.chessBoard.getCurrentPlayer().unMakeMove(lastMove).getTransitionBoard();
+            this.chessBoard = this.chessBoard.getCurrentPlayer().unMakeMove(lastMove).transitionBoard();
         }
         this.computerMove = null;
         Table.get().getMoveLog().clear();
@@ -130,6 +134,10 @@ public class Table extends Observable {
 
     private DebugPanel getDebugPanel() {
         return this.debugPanel;
+    }
+
+    private String getPgnString() {
+        return this.pgnString;
     }
 
     //Chess board display
@@ -164,12 +172,9 @@ public class Table extends Observable {
         final JMenu optionsMenu = new JMenu("Options");
 
         final JMenuItem setupGameMenuItem = new JMenuItem("Setup Game");
-        setupGameMenuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Table.get().getGameSetup().promptUser();
-                Table.get().setupUpdate(Table.get().getGameSetup());
-            }
+        setupGameMenuItem.addActionListener(e -> {
+            Table.get().getGameSetup().promptUser();
+            Table.get().setupUpdate(Table.get().getGameSetup());
         });
 
         optionsMenu.add(setupGameMenuItem);
@@ -196,10 +201,12 @@ public class Table extends Observable {
 
                 if(Table.get().getGameBoard().getCurrentPlayer().inCheckMate()) {
                     System.out.println("Game over, " + Table.get().getGameBoard().getCurrentPlayer() + " is in checkmate!");
+                    System.out.println(Table.get().getPgnString());
                 }
 
                 if(Table.get().getGameBoard().getCurrentPlayer().inStaleMate()) {
                     System.out.println("Game over, " + Table.get().getGameBoard().getCurrentPlayer() + " is in stalemate!");
+                    System.out.println(Table.get().getPgnString());
                 }
         }
     }
@@ -237,17 +244,16 @@ public class Table extends Observable {
     }
 
     private static class AIThinkTank extends SwingWorker<Move, String> {
+
         private AIThinkTank() {
 
         }
 
         @Override
-        protected Move doInBackground() throws Exception {
-            final MoveStrategy miniMax = new MiniMax(4);
+        protected Move doInBackground() {
+            final MoveStrategy miniMax = new MiniMax(Table.get().getGameSetup().getSearchDepth());
 
-            final Move bestMove = miniMax.execute(Table.get().getGameBoard());
-
-            return bestMove;
+            return miniMax.execute(Table.get().getGameBoard());
         }
 
         @Override
@@ -256,16 +262,23 @@ public class Table extends Observable {
                 final Move bestMove = get();
 
                 Table.get().updateComputerMove(bestMove);
-                Table.get().updateGameBoard(Table.get().getGameBoard().getCurrentPlayer().makeMove(bestMove).getTransitionBoard());
+                Table.get().updateGameBoard(Table.get().getGameBoard().getCurrentPlayer().makeMove(bestMove).transitionBoard());
                 Table.get().getMoveLog().addMove(bestMove);
+
+                if(Table.get().moveCounter == 1) {
+                    Table.get().pgnString += Table.get().moveCounter + ". ";
+                } else if(Table.get().moveCounter % 2 == 1 && Table.get().moveCounter != 2) {
+                    Table.get().pgnString += (Table.get().moveCounter/2 + 1) + ". ";
+                }
+                Table.get().pgnString += bestMove + " ";
+                Table.get().moveCounter++;
+
                 Table.get().getGameHistoryPanel().redo(Table.get().getGameBoard(), Table.get().getMoveLog());
                 Table.get().getTakenPiecesPanel().redo(Table.get().getMoveLog());
                 Table.get().getBoardPanel().drawBoard(Table.get().getGameBoard());
                 Table.get().moveMadeUpdate(PlayerType.COMPUTER);
 
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            } catch (ExecutionException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -348,9 +361,17 @@ public class Table extends Observable {
                             destinationTile = chessBoard.getTile(tileId);
                             final Move move = Move.MoveFactory.createMove(chessBoard, sourceTile.getTileCoordinate(), destinationTile.getTileCoordinate());
                             final MoveTransition transition = chessBoard.getCurrentPlayer().makeMove(move);
-                            if(transition.getMoveStatus().isDone()) {
-                                chessBoard = transition.getTransitionBoard();
+                            if(transition.moveStatus().isDone()) {
+                                chessBoard = transition.transitionBoard();
                                 moveLog.addMove(move);
+                                if(moveCounter == 1) {
+                                    pgnString += moveCounter;
+                                } else if(moveCounter % 2 == 0) {
+                                    pgnString += moveCounter/2;
+                                }
+                                pgnString += ". " + move + " ";
+                                moveCounter++;
+
                                 //add move to move log
                             }
 
@@ -443,12 +464,34 @@ public class Table extends Observable {
     }
 
     private Collection<Move> pieceLegalMoves(Board board) {
+
         if(humanMovedPiece != null && humanMovedPiece.getAlliance() == board.getCurrentPlayer().getAlliance()) {
-            return humanMovedPiece.calculateLegals(board);
+            return possibleMoves(board);
         }
+
         return Collections.emptyList();
     }
 
+    private boolean moveIntoCheck(final Move move, final Board board) {
+
+        if(board.getCurrentPlayer() != null) {
+            final MoveTransition transition = board.getCurrentPlayer().makeMove(move);
+            return !transition.moveStatus().isDone();
+        }
+        return false;
+    }
+
+    private Collection<Move> possibleMoves(final Board board) {
+        Collection<Move> playerMoves = new ArrayList<>();
+
+        for(Move move : humanMovedPiece.calculateLegals(board)) {
+            final MoveTransition transition = board.getCurrentPlayer().makeMove(move);
+            if(transition.moveStatus().isDone()) {
+                playerMoves.add(move);
+            }
+        }
+        return playerMoves;
+    }
     private JMenu createPreferencesMenu() {
         final JMenu preferencesMenu = new JMenu("Preferences");
         final JMenuItem flipBoardMenuItem = new JMenuItem("Flip Board");

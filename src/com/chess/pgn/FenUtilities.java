@@ -10,6 +10,7 @@ public class FenUtilities {
         throw new RuntimeException("Not instantiable!");
     }
 
+    //TODO: Make FEN File input and output
     public static Board createGameFromFEN(final String fenString) {
         return null;
     }

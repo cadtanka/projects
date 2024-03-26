@@ -64,19 +64,19 @@ class TestBoard {
 
         final MoveTransition moveTransition = board.getCurrentPlayer().makeMove(move);
 
-        assertTrue(moveTransition.getMoveStatus().isDone());
-        assertEquals(moveTransition.getTransitionBoard().getCurrentPlayer().getAlliance(), Alliance.BLACK);
-        assertNotEquals(moveTransition.getTransitionBoard().getCurrentPlayer().getAlliance(), Alliance.WHITE);
-        assertEquals(moveTransition.getTransitionBoard().getCurrentPlayer().getActivePieces().size(), 1);
-        assertEquals(moveTransition.getTransitionBoard().getCurrentPlayer().getOpponent().getActivePieces().size(), 1);
+        assertTrue(moveTransition.moveStatus().isDone());
+        assertEquals(moveTransition.transitionBoard().getCurrentPlayer().getAlliance(), Alliance.BLACK);
+        assertNotEquals(moveTransition.transitionBoard().getCurrentPlayer().getAlliance(), Alliance.WHITE);
+        assertEquals(moveTransition.transitionBoard().getCurrentPlayer().getActivePieces().size(), 1);
+        assertEquals(moveTransition.transitionBoard().getCurrentPlayer().getOpponent().getActivePieces().size(), 1);
 
         final Move move1 = Move.MoveFactory.createMove(board, 60, 64);
 
         final MoveTransition moveTransition1 = board.getCurrentPlayer().makeMove(move1);
 
-        assertFalse(moveTransition1.getMoveStatus().isDone());
-        assertNotEquals(moveTransition1.getTransitionBoard().getCurrentPlayer().getAlliance(), Alliance.BLACK);
-        assertEquals(moveTransition1.getTransitionBoard().getCurrentPlayer().getAlliance(), Alliance.WHITE);
+        assertFalse(moveTransition1.moveStatus().isDone());
+        assertNotEquals(moveTransition1.transitionBoard().getCurrentPlayer().getAlliance(), Alliance.BLACK);
+        assertEquals(moveTransition1.transitionBoard().getCurrentPlayer().getAlliance(), Alliance.WHITE);
     }
 
     @Test
@@ -99,27 +99,27 @@ class TestBoard {
 
         final MoveTransition t1 = board.getCurrentPlayer().makeMove(move1);
 
-        assertTrue(t1.getMoveStatus().isDone());
+        assertTrue(t1.moveStatus().isDone());
 
-        Move move2 = Move.MoveFactory.createMove(t1.getTransitionBoard(), BoardUtils.getCoordinateAtPosition("e7"),
+        Move move2 = Move.MoveFactory.createMove(t1.transitionBoard(), BoardUtils.getCoordinateAtPosition("e7"),
                 BoardUtils.getCoordinateAtPosition("e5"));
 
-        final MoveTransition t2 = t1.getTransitionBoard().getCurrentPlayer().makeMove(move2);
+        final MoveTransition t2 = t1.transitionBoard().getCurrentPlayer().makeMove(move2);
 
-        assertTrue(t2.getMoveStatus().isDone());
+        assertTrue(t2.moveStatus().isDone());
 
-        Move move3 = Move.MoveFactory.createMove(t2.getTransitionBoard(), BoardUtils.getCoordinateAtPosition("g2"),
+        Move move3 = Move.MoveFactory.createMove(t2.transitionBoard(), BoardUtils.getCoordinateAtPosition("g2"),
                 BoardUtils.getCoordinateAtPosition("g4"));
 
-        final MoveTransition t3 = t2.getTransitionBoard().getCurrentPlayer().makeMove(move3);
+        final MoveTransition t3 = t2.transitionBoard().getCurrentPlayer().makeMove(move3);
 
-        assertTrue(t3.getMoveStatus().isDone());
+        assertTrue(t3.moveStatus().isDone());
 
         final MoveStrategy strategy = new MiniMax(4);
 
-        final Move aiMove = strategy.execute(t3.getTransitionBoard());
+        final Move aiMove = strategy.execute(t3.transitionBoard());
 
-        final Move bestMove = Move.MoveFactory.createMove(t3.getTransitionBoard(), BoardUtils.getCoordinateAtPosition("d8"),
+        final Move bestMove = Move.MoveFactory.createMove(t3.transitionBoard(), BoardUtils.getCoordinateAtPosition("d8"),
                 BoardUtils.getCoordinateAtPosition("h4"));
 
         assertEquals(aiMove, bestMove);

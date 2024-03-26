@@ -3,20 +3,19 @@ package com.chess.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.util.Observable;
-import java.util.Observer;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
-class DebugPanel extends JPanel implements Observer {
+import static java.net.http.WebSocket.*;
+
+class DebugPanel extends JPanel implements Listener {
 
     private static final Dimension CHAT_PANEL_DIMENSION = new Dimension(600, 150);
-    private final JTextArea jTextArea;
 
     public DebugPanel() {
         super(new BorderLayout());
-        this.jTextArea = new JTextArea("");
-        add(this.jTextArea);
+        JTextArea jTextArea = new JTextArea("");
+        add(jTextArea);
         setPreferredSize(CHAT_PANEL_DIMENSION);
         validate();
         setVisible(true);
@@ -25,12 +24,4 @@ class DebugPanel extends JPanel implements Observer {
     public void redo() {
         validate();
     }
-
-    @Override
-    public void update(final Observable obs,
-                       final Object obj) {
-        this.jTextArea.setText(obj.toString().trim());
-        redo();
-    }
-
 }

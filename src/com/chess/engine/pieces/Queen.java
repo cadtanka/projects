@@ -51,6 +51,7 @@ public class Queen extends Piece {
         }
         return ImmutableList.copyOf(legalMoves);
     }
+
     @Override
     public String toString() {
         return PieceType.QUEEN.toString();
