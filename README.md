@@ -10,4 +10,7 @@ Campus Paths: This program displays a map of the University of Washington and al
 
 Poly: A fully functioning calculator that can do arithmetic with complex numbers. Programmed in Java
 
-Vaccine Scheduler: Using a database and encryption, patients and doctors can create personal accounts. A client can create an appointment with available doctors on any day given they are available. Doctors can also access their own schedules. The stock of vaccines are also kept track of, and appointments will not be issued if not enough of a certain vaccine is avaliable. 
+Vaccine Scheduler: Using a database and encryption, patients and doctors can create personal accounts. A client can create an appointment with available doctors on any day given they are available. Doctors can also access their own schedules. The stock of vaccines are also kept track of, and appointments will not be issued if not enough of a certain vaccine is available. 
+
+Math 381 Group Project - Worked with a cargo company to develop an algorithm to more efficiently pack shipping containers
+
