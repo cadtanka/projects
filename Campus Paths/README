@@ -1,2 +1,3 @@
-This project created all the logic for nodes, edges, and algorithms to create a google-map esk web app. The user is prommped to select two buildings, and a red line is drawn between the two representing
-the shortest walking path (through the use of Dkijtsta's Shortest Path algorithm). All work was done in Java, with React used to make the GUi
+This project created all the logic for nodes, edges, and algorithms to create a google-map esk web app. The user is prommped to select two buildings, 
+and a red line is drawn between the two representing the shortest walking path (through the use of Dkijtsta's Shortest Path algorithm). 
+All work was done in Java, with React used to make the GUI
