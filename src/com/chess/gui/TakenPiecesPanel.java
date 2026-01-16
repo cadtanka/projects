@@ -68,7 +68,7 @@ public class TakenPiecesPanel extends JPanel {
         blackTakenPieces.sort((o1, o2) -> Ints.compare(o1.getPieceValue(), o2.getPieceValue()));
 
         //TODO: Put in separate methods
-        String defaultPieceImagesPath = "art/pieces/plain/";
+        String defaultPieceImagesPath = "/Users/cadetanaka/Desktop/Other projects/ML-Chess_Proj/projects/art/pieces/plain/";
         for(final Piece takenPiece : whiteTakenPieces) {
             try {
                 final BufferedImage image = ImageIO.read(new File(defaultPieceImagesPath

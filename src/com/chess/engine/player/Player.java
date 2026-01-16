@@ -74,7 +74,7 @@ public abstract class Player {
     }
 
     public boolean inCheckMate() {
-        return this.inCheck && hasEscape();
+        return this.inCheck && !hasEscape();
     }
 
     //Makes the move on a hypothetical board, and checks whether it's in check
@@ -83,10 +83,10 @@ public abstract class Player {
         for(final Move move : this.legalMoves) {
             final MoveTransition transition = makeMove(move);
             if(transition.moveStatus().isDone()) {
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
 // --Commented out by Inspection START (3/2/24, 11:55 AM):
@@ -111,7 +111,7 @@ public abstract class Player {
 // --Commented out by Inspection STOP (3/2/24, 11:55 AM)
 
     public boolean inStaleMate() {
-        return !this.inCheck() && this.hasEscape();
+        return this.getLegalMoves().size() == 0;
     }
 
     public boolean isCastled() {

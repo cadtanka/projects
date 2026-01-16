@@ -48,6 +48,7 @@ public class Table extends Observable {
     private final Color darkTileColor = Color.decode("#593E1A");
     private static final Table INSTANCE = new Table();
     private final DebugPanel debugPanel;
+    private static final int MAX_PLIES = 300;
 
     public static Table get() {
         return INSTANCE;
@@ -77,12 +78,18 @@ public class Table extends Observable {
         this.addObserver(new TableGameAIWatcher());
         this.gameSetup = new GameSetup(this.gameFrame, true);
         this.boardDirection = BoardDirection.NORMAL;
-        this.highlightLegalMoves = false;
+        this.highlightLegalMoves = true;
         gameFrame.add(this.takenPiecesPanel, BorderLayout.WEST);
         gameFrame.add(this.gameHistoryPanel, BorderLayout.EAST);
         gameFrame.add(this.boardPanel, BorderLayout.CENTER);
 
         gameFrame.setVisible(true);
+    }
+
+    private boolean isGameOver() {
+        return chessBoard.getCurrentPlayer().inCheckMate()
+            || chessBoard.getCurrentPlayer().inStaleMate()
+            || moveLog.size() >= MAX_PLIES;
     }
 
     private JMenuBar createTableMenu() {
@@ -259,11 +266,18 @@ public class Table extends Observable {
         @Override
         public void done() {
             try {
+
+                if (Table.get().isGameOver()) {
+                    return;
+                }
+
                 final Move bestMove = get();
 
                 Table.get().updateComputerMove(bestMove);
                 Table.get().updateGameBoard(Table.get().getGameBoard().getCurrentPlayer().makeMove(bestMove).transitionBoard());
                 Table.get().getMoveLog().addMove(bestMove);
+
+                Table.get().moveCounter++;
 
                 if(Table.get().moveCounter == 1) {
                     Table.get().pgnString += Table.get().moveCounter + ". ";
@@ -277,6 +291,17 @@ public class Table extends Observable {
                 Table.get().getTakenPiecesPanel().redo(Table.get().getMoveLog());
                 Table.get().getBoardPanel().drawBoard(Table.get().getGameBoard());
                 Table.get().moveMadeUpdate(PlayerType.COMPUTER);
+
+                if (Table.get().isGameOver()) {
+                    System.out.println("Game over");
+                } else if (Table.get().getGameBoard().getCurrentPlayer().inStaleMate()) {
+                    System.out.println("Stalemate");
+                } else {
+                    System.out.println("Move limit reached");
+                }
+
+                return; // 🔴 HARD STOP
+
 
             } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
@@ -430,7 +455,7 @@ public class Table extends Observable {
             if(board.getTile(this.tileId).isOccupied()) {
                 try {
                     //Finding the path of the file for the image
-                    String defaultPieceImagesPath = "art/pieces/plain/";
+                    String defaultPieceImagesPath = "/Users/cadetanaka/Desktop/Other projects/ML-Chess_Proj/projects/art/pieces/plain/";
                     final BufferedImage image =
                             ImageIO.read(new File(defaultPieceImagesPath + board.getTile(this.tileId).getPiece().getAlliance().toString().charAt(0) +
                                     board.getTile(this.tileId).getPiece().toString() + ".gif"));
@@ -450,15 +475,20 @@ public class Table extends Observable {
 
         private void highlightLegals(final Board board) {
             if(highlightLegalMoves) {
+                // System.out.println(" moves for tile: " + this.tileId);
                 for(final Move move : pieceLegalMoves(board)) {
+                    // System.out.println("Legal move destination: " + move.getDestinationCoordinate());
                     if(move.getDestinationCoordinate() == this.tileId) {
+                        // System.out.println("Match! Should show green dot on tile: " + this.tileId);
                         try {
-                            add(new JLabel(new ImageIcon(ImageIO.read(new File("art/misc/green_dot.png")))));
+                            add(new JLabel(new ImageIcon(ImageIO.read(new File("/Users/cadetanaka/Desktop/Other projects/ML-Chess_Proj/projects/art/misc/green_dot.png")))));
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
                 }
+            } else {
+                System.out.println("highlightLegalMoves is FALSE");
             }
         }
     }
