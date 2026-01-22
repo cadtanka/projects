@@ -133,8 +133,10 @@ public class King extends Piece {
                 final Piece rookPiece = board.getTile(63).getPiece();
 
                 if (rookPiece != null && rookPiece.isFirstMove()) {
-                    if (Player.calculateAttackOnTile(61, opponentLegals).isEmpty() &&
+                    if (Player.calculateAttackOnTile(60, opponentLegals).isEmpty() &&
+                            Player.calculateAttackOnTile(61, opponentLegals).isEmpty() &&
                             Player.calculateAttackOnTile(62, opponentLegals).isEmpty() &&
+                            Player.calculateAttackOnTile(63, opponentLegals).isEmpty() &&
                             rookPiece.getPieceType() == PieceType.ROOK) {
                         if (isKingPawnTrap(board, this, 52)) {
                             //Adds castling moves
@@ -152,8 +154,11 @@ public class King extends Piece {
                 final ChessTile rookTile = board.getTile(56);
 
                 if (rookTile.isOccupied() && rookTile.getPiece().isFirstMove() &&
+                        Player.calculateAttackOnTile(56, opponentLegals).isEmpty() &&
+                        Player.calculateAttackOnTile(57, opponentLegals).isEmpty() &&
                         Player.calculateAttackOnTile(58, opponentLegals).isEmpty() &&
                         Player.calculateAttackOnTile(59, opponentLegals).isEmpty() &&
+                        Player.calculateAttackOnTile(60, opponentLegals).isEmpty() &&
                         rookTile.getPiece().getPieceType().isRook()) {
                     if (isKingPawnTrap(board, this, 52)) {
                         kingCastles.add(new Move.QueenSideCastleMove(board, this, 58,
@@ -178,8 +183,11 @@ public class King extends Piece {
                 final Piece rookPiece = board.getTile(7).getPiece();
 
                 if (rookPiece != null && rookPiece.isFirstMove()) {
-                    if (Player.calculateAttackOnTile(5, opponentLegals).isEmpty() &&
+                    if (    
+                            Player.calculateAttackOnTile(4, opponentLegals).isEmpty() &&
+                            Player.calculateAttackOnTile(5, opponentLegals).isEmpty() &&
                             Player.calculateAttackOnTile(6, opponentLegals).isEmpty() &&
+                            Player.calculateAttackOnTile(7, opponentLegals).isEmpty() &&
                             rookPiece.getPieceType() == PieceType.ROOK) {
                         if (isKingPawnTrap(board, this, 12)) {
                             //Adds castling moves
@@ -192,13 +200,14 @@ public class King extends Piece {
 
             //Check to see if castle spaces are empty
             if (!board.getTile(1).isOccupied() &&
-                    !board.getTile(2).isOccupied() &&
-                    !board.getTile(3).isOccupied()) {
+                    !board.getTile(2).isOccupied()) {
                 final ChessTile rookTile = board.getTile(0);
 
                 if (rookTile.isOccupied() && rookTile.getPiece().isFirstMove() &&
                         Player.calculateAttackOnTile(2, opponentLegals).isEmpty() &&
+                        Player.calculateAttackOnTile(2, opponentLegals).isEmpty() &&
                         Player.calculateAttackOnTile(3, opponentLegals).isEmpty() &&
+                        Player.calculateAttackOnTile(2, opponentLegals).isEmpty() &&
                         rookTile.getPiece().getPieceType().isRook()) {
                     if (isKingPawnTrap(board, this, 12)) {
                         kingCastles.add(new Move.QueenSideCastleMove(board, this, 2,

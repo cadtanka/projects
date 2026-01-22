@@ -3,11 +3,8 @@ package com.chess.selfplay;
 import com.chess.engine.board.Board;
 import com.chess.engine.board.Move;
 import com.chess.pgn.FenUtilities;
-
 import java.io.FileWriter;
 import java.io.IOException;
-
-import java.util.ArrayList;
 import java.util.List;
 
 public class SelfPlayLogger {
@@ -22,19 +19,24 @@ public class SelfPlayLogger {
     public static void logMoveForML(
             Board board,
             Move move,
+            String uci_move,
             double eval,
             int ply,
             int gameId,
             List<String> gameBuffer
     ) {
         String fen = FenUtilities.createFENFromGame(board);
-        String moveUCI = move.toString();
+        String alg_move = move.toString();
         String sideToMove = board.getCurrentPlayer().getAlliance().isWhite() ? "w" : "b";
         double normEval = normalizeEval(eval);
+        
+        if (board.getCurrentPlayer().inStaleMate()) {
+            normEval = 0;
+        }
 
         String record = String.format(
-                "{\"game_id\": %d, \"ply\": %d, \"fen\": \"%s\", \"side\": \"%s\", \"move\": \"%s\", \"value\": %.4f}",
-                gameId, ply, fen, sideToMove, moveUCI, normEval
+                "{\"game_id\": %d, \"ply\": %d, \"fen\": \"%s\", \"side\": \"%s\", \"alg_move\": \"%s\", \"uci_move\": \"%s\", \"value\": %.4f}",
+                gameId, ply, fen, sideToMove, alg_move, uci_move, normEval
         );
 
         gameBuffer.add(record);

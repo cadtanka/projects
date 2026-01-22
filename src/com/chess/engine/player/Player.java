@@ -111,7 +111,22 @@ public abstract class Player {
 // --Commented out by Inspection STOP (3/2/24, 11:55 AM)
 
     public boolean inStaleMate() {
-        return this.getLegalMoves().size() == 0;
+        // If in check, cannot be stalemate (would be checkmate or has escape)
+        if (this.inCheck) {
+            return false;
+        }
+        
+        // Check if player has any actually valid moves
+        // (legalMoves contains pseudo-legal moves that might leave king in check)
+        for (final Move move : this.legalMoves) {
+            final MoveTransition transition = makeMove(move);
+            if (transition.moveStatus().isDone()) {
+                return false; // Found a valid move, not stalemate
+            }
+        }
+        
+        // Not in check and no valid moves = stalemate
+        return true;
     }
 
     public boolean isCastled() {
