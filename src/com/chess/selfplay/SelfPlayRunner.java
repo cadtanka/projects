@@ -36,6 +36,18 @@ public class SelfPlayRunner {
         int ply = 0;
 
         while (!isGameOver(board, ply)) {
+
+            // TODO: WIRE THIS UP SO IT DOESNt ERROR
+            if(board.getCurrentPlayer() == Player.ML) {
+                String fen = board.toString();
+                List<String> legalMoves = board.getAllLegalMoves();
+
+                String response = MLPolicyClient.getBestMove(fen, legalMoves);
+                Move mlMove = parseMoveFromResponse(response);
+
+                board.makeMove(mlMove);
+            }
+
             Move move = ai.execute(board);
 
             if (move == null) {
